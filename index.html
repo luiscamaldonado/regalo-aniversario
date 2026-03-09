@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Feliz Aniversario mi Amor</title>
     <!-- Fuentes elegantes de Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@300;400&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@300;400;600&display=swap"
         rel="stylesheet">
     <style>
         body,
@@ -19,10 +19,11 @@
             font-family: 'Montserrat', sans-serif;
             overflow: hidden;
             touch-action: none;
-            /* Previene scroll en móviles */
+            color: white;
             display: flex;
             justify-content: center;
             align-items: center;
+            text-align: center;
         }
 
         .container {
@@ -32,303 +33,347 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            cursor: pointer;
-            perspective: 1000px;
+            flex-direction: column;
+            overflow: hidden;
         }
 
-        /* Contenedor de las imágenes para darles algo de movimiento suave */
-        .images-wrapper {
-            position: relative;
-            width: 100vw;
-            height: 100vh;
+        /* --- PANTALLA INICIAL --- */
+        #start-screen {
+            position: absolute;
+            z-index: 50;
+            width: 100%;
+            height: 100%;
             display: flex;
             justify-content: center;
             align-items: center;
-            transition: transform 3s ease-in-out;
+            background: radial-gradient(circle at center, #1a0510 0%, #000000 100%);
+            cursor: pointer;
+            transition: opacity 2s ease-in-out;
         }
 
-        /* Estilos base de las imágenes fotorrealistas */
-        .box-image {
-            position: absolute;
-            max-width: 100%;
-            max-height: 100%;
-            min-width: 100%;
-            min-height: 100%;
-            object-fit: cover;
-            /* Asegura que cubran toda la pantalla como un fondo cinematográfico */
-            transition: opacity 2.5s ease-in-out, filter 2.5s ease-in-out, transform 4s ease-out;
-            box-shadow: inset 0 0 100px rgba(0, 0, 0, 1);
+        #start-text {
+            font-size: 1.5rem;
+            font-weight: 300;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: rgba(255, 215, 0, 0.9);
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+            animation: pulse 2s infinite ease-in-out;
         }
 
-        /* Estado Inicial: Caja Cerrada visible */
-        #caja-cerrada {
-            z-index: 2;
-            opacity: 1;
-            transform: scale(1.05);
-            /* Ligeramente más grande para que el zoom out se note */
-            filter: brightness(0.9);
-        }
-
-        /* Estado Inicial: Caja Abierta oculta */
-        #caja-abierta {
-            z-index: 1;
-            opacity: 0;
-            transform: scale(1);
-            filter: brightness(0.3) blur(10px);
-        }
-
-        /* Viñeta oscura en los bordes para mayor efecto cinematográfico */
-        .vignette {
+        /* --- GALERÍA DEL ANILLO --- */
+        #ring-gallery {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: radial-gradient(circle at center, transparent 40%, rgba(0, 0, 0, 0.8) 100%);
-            z-index: 3;
-            pointer-events: none;
-        }
-
-        /* === CUANDO EL USUARIO TOCA === */
-
-        /* Acercamiento global de toda la escena */
-        .is-open .images-wrapper {
-            transform: scale(1.1);
-            /* Efecto de acercarse a la caja */
-        }
-
-        .is-open #caja-cerrada {
-            opacity: 0;
-            /* Desaparece suavemente */
-            filter: blur(5px);
-            pointer-events: none;
-        }
-
-        .is-open #caja-abierta {
-            opacity: 1;
-            /* Aparece la caja abierta brillante */
-            filter: brightness(1.1) contrast(1.1) blur(0px);
-            /* El anillo resplandece */
-            z-index: 3;
-        }
-
-        /* Texto de instrucción titilante */
-        #instruction {
-            position: absolute;
-            bottom: 10%;
-            width: 100%;
-            text-align: center;
             z-index: 10;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 2s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .ring-images {
+            position: relative;
+            width: 100vw;
+            height: 60vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: -10vh;
+            /* Ajuste hacia arriba para dejar espacio al texto */
+        }
+
+        .ring-img {
+            position: absolute;
+            max-width: 90%;
+            max-height: 100%;
+            object-fit: contain;
+            opacity: 0;
+            transition: opacity 2s ease-in-out, transform 4s ease-out;
+            transform: scale(0.95);
+            filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.2));
+        }
+
+        .ring-img.active {
+            opacity: 1;
+            transform: scale(1.05);
+        }
+
+        .text-overlay {
+            position: absolute;
+            bottom: 15%;
+            width: 100%;
+            padding: 0 20px;
+            box-sizing: border-box;
+            opacity: 0;
+            transition: opacity 2s ease-in-out;
+        }
+
+        h1 {
+            font-family: 'Great Vibes', cursive;
+            font-size: 4rem;
+            margin: 0;
+            color: #ffd700;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5), 0 0 10px rgba(255, 255, 255, 0.8), 2px 2px 8px rgba(0, 0, 0, 1);
+        }
+
+        p.subtitle {
             font-size: 1.2rem;
             font-weight: 300;
-            letter-spacing: 4px;
-            text-transform: uppercase;
-            color: rgba(255, 255, 255, 0.9);
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 1), 0 0 5px rgba(255, 255, 255, 0.5);
-            animation: pulse 2.5s infinite ease-in-out;
-            pointer-events: none;
-            transition: opacity 1s ease, transform 1s ease;
+            letter-spacing: 2px;
+            margin-top: 10px;
+            text-shadow: 2px 2px 6px rgba(0, 0, 0, 1);
         }
 
-        .is-open #instruction {
+        .btn-store {
+            margin-top: 25px;
+            padding: 15px 40px;
+            background: linear-gradient(45deg, #ffd700, #ffaa00);
+            border: none;
+            border-radius: 30px;
+            color: #000;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
+            transition: transform 0.3s, box-shadow 0.3s;
+            opacity: 0;
+            pointer-events: none;
+            /* Se activa después de unos segundos */
+        }
+
+        .btn-store.visible {
+            opacity: 1;
+            pointer-events: auto;
+            animation: bounceIn 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        /* --- PANTALLA DE LA TIENDA (KEVIN'S) --- */
+        #store-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 20;
+            opacity: 0;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(circle at center, #2a2a2a 0%, #000000 100%);
+            transition: opacity 2s ease-in-out;
+        }
+
+        .store-logo {
+            width: 80%;
+            max-width: 400px;
+            margin-bottom: 40px;
+            filter: drop-shadow(0 0 30px rgba(255, 255, 255, 0.2));
+            transform: scale(0.8);
+            transition: transform 2s ease-out;
+        }
+
+        #store-screen.active .store-logo {
+            transform: scale(1);
+        }
+
+        .store-message {
+            font-size: 1.4rem;
+            font-weight: 300;
+            line-height: 1.6;
+            letter-spacing: 1px;
+            padding: 0 30px;
+            color: #fff;
             opacity: 0;
             transform: translateY(20px);
+            transition: opacity 2s ease, transform 2s ease;
+            transition-delay: 1s;
+        }
+
+        #store-screen.active .store-message {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .store-message span {
+            color: #ffd700;
+            font-weight: 600;
+            font-size: 1.6rem;
+            display: block;
+            margin-top: 15px;
+            font-family: 'Great Vibes', cursive;
+            font-size: 3rem;
+            letter-spacing: 2px;
+        }
+
+        /* --- EFECTOS EXTRAS --- */
+        .sparkle {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="2" fill="%23fff" opacity="0.5"/></svg>') repeat;
+            opacity: 0.1;
+            z-index: 100;
         }
 
         @keyframes pulse {
             0% {
                 transform: scale(1);
-                opacity: 0.6;
+                opacity: 0.5;
             }
 
             50% {
                 transform: scale(1.05);
                 opacity: 1;
-                text-shadow: 0 0 20px rgba(255, 255, 255, 1);
             }
 
             100% {
                 transform: scale(1);
-                opacity: 0.6;
+                opacity: 0.5;
             }
         }
 
-        /* Capa de los textos finales */
-        #ui-layer {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 5;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 3s ease-in-out;
-            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.4) 0%, transparent 40%, rgba(0, 0, 0, 0.8) 100%);
-        }
-
-        h1 {
-            font-family: 'Great Vibes', cursive;
-            font-size: 5.5rem;
-            margin: 0;
-            color: #ffd700;
-            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5), 0 0 10px rgba(255, 255, 255, 0.8), 2px 2px 8px rgba(0, 0, 0, 1);
-            transform: translateY(-20px);
-            padding: 0 20px;
-        }
-
-        p {
-            font-size: 1.6rem;
-            font-weight: 300;
-            letter-spacing: 3px;
-            color: white;
-            margin-top: 15px;
-            padding: 0 20px;
-            text-shadow: 2px 2px 6px rgba(0, 0, 0, 1), 0 0 10px rgba(255, 255, 255, 0.3);
-        }
-
-        /* Efecto destello (Lens Flare) */
-        .flare {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 200vw;
-            height: 200vh;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0) 60%);
-            mix-blend-mode: screen;
-            opacity: 0;
-            z-index: 4;
-            pointer-events: none;
-            transition: opacity 2s ease-in-out;
-        }
-
-        .is-open .flare {
-            animation: flash 4s ease-out forwards;
-        }
-
-        @keyframes flash {
+        @keyframes bounceIn {
             0% {
-                opacity: 0;
-                transform: translate(-50%, -50%) scale(0.5);
+                transform: scale(0);
             }
 
-            20% {
-                opacity: 0.8;
-                transform: translate(-50%, -50%) scale(1);
+            50% {
+                transform: scale(1.1);
             }
 
-            /* Brillo máximo rápido */
             100% {
-                opacity: 0;
-                transform: translate(-50%, -50%) scale(1.5);
+                transform: scale(1);
             }
-
-            /* Se desvanece lento */
         }
 
         @media (max-width: 600px) {
             h1 {
-                font-size: 3.8rem;
-            }
-
-            p {
-                font-size: 1.1rem;
-            }
-
-            #instruction {
-                font-size: 1rem;
-                bottom: 15%;
-            }
-
-            .box-image {
-                object-position: center bottom;
-            }
-
-            /* Alinea mejor el móvil a la caja */
-        }
-
-        @media (max-height: 700px) {
-            h1 {
                 font-size: 3.5rem;
             }
 
-            #instruction {
-                bottom: 5%;
+            p.subtitle {
+                font-size: 1rem;
+            }
+
+            #start-text {
+                font-size: 1.2rem;
+            }
+
+            .store-message {
+                font-size: 1.2rem;
+            }
+
+            .store-message span {
+                font-size: 2.5rem;
             }
         }
     </style>
 </head>
 
 <body>
-    <div class="container" id="gift-container">
-
-        <div class="images-wrapper">
-            <!-- Dos imágenes fotorrealistas solapadas -->
-            <img src="caja_cerrada.png" id="caja-cerrada" class="box-image" alt="Misteriosa caja de regalo cerrada">
-            <img src="caja_abierta.png" id="caja-abierta" class="box-image"
-                alt="Anillo de compromiso diamante brillante">
+    <div class="container">
+        <!-- Pantalla 1: Inicio -->
+        <div id="start-screen" onclick="startExperience()">
+            <div id="start-text">Toca para descubrir tu sorpresa</div>
+            <div class="sparkle"></div>
         </div>
 
-        <div class="vignette"></div>
-        <div class="flare"></div>
+        <!-- Pantalla 2: Galería del Anillo -->
+        <div id="ring-gallery">
+            <div class="ring-images">
+                <img src="a1.webp" class="ring-img active" alt="Anillo vista 1">
+                <img src="a2.webp" class="ring-img" alt="Anillo vista 2">
+                <img src="a3.webp" class="ring-img" alt="Anillo vista 3">
+                <img src="a4.webp" class="ring-img" alt="Anillo vista 4">
+            </div>
 
-        <div id="instruction">Toca para descubrir tu sorpresa</div>
+            <div class="text-overlay" id="ring-text">
+                <h1>Feliz Aniversario mi Amor</h1>
+                <p class="subtitle">Hecho a tu medida, con todo mi corazón.</p>
+                <button class="btn-store" id="btn-next" onclick="showStore()">¿Dónde está mi anillo?</button>
+            </div>
+        </div>
 
-        <div id="ui-layer">
-            <h1 id="titleText">Feliz Aniversario mi Amor</h1>
-            <p id="subText">Tú eres el mejor regalo de mi vida.</p>
+        <!-- Pantalla 3: La Tienda Kevin's -->
+        <div id="store-screen">
+            <img src="kevins.svg" class="store-logo" alt="Kevin's Joyeros">
+            <div class="store-message">
+                Tu regalo te está esperando en la joyería para que vayas a recogerlo.
+                <span>¡Te Amo!</span>
+            </div>
         </div>
     </div>
 
-    <!-- Usamos un pequeño script para coordinar la interactividad y los ritmos fluidos -->
     <script>
-        const container = document.getElementById('gift-container');
-        const instruction = document.getElementById('instruction');
-        const uiLayer = document.getElementById('ui-layer');
-        const titleText = document.getElementById('titleText');
-        const subText = document.getElementById('subText');
-        let isOpen = false;
+        const startScreen = document.getElementById('start-screen');
+        const ringGallery = document.getElementById('ring-gallery');
+        const storeScreen = document.getElementById('store-screen');
+        const ringText = document.getElementById('ring-text');
+        const btnNext = document.getElementById('btn-next');
+        const images = document.querySelectorAll('.ring-img');
 
-        function revealGift(event) {
-            if (!isOpen) {
-                isOpen = true;
+        let currentImageIndex = 0;
+        let sliderInterval;
 
-                // Efecto háptico en móviles (Vibración suave)
-                if (navigator.vibrate) {
-                    navigator.vibrate([40, 60, 40]);
-                }
+        function startExperience() {
+            // Ocultar inicio
+            startScreen.style.opacity = '0';
+            setTimeout(() => { startScreen.style.display = 'none'; }, 2000);
 
-                // Disparar las animaciones CSS (Transición de imágenes y destellos)
-                container.classList.add('is-open');
+            // Mostrar Galería
+            ringGallery.style.opacity = '1';
+            ringGallery.style.pointerEvents = 'auto';
 
-                // Animar la entrada del texto elegante después del impacto del destello
-                setTimeout(() => {
-                    uiLayer.style.opacity = '1';
+            // Iniciar Crossfade de imágenes
+            sliderInterval = setInterval(fadeNextImage, 3500);
 
-                    // Asegurarnos de que el texto entre suavemente desde abajo
-                    titleText.animate([
-                        { transform: 'translateY(40px)', opacity: 0 },
-                        { transform: 'translateY(-20px)', opacity: 1 }
-                    ], { duration: 2500, easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)', fill: 'forwards' });
+            // Mostrar el texto y el botón con un pequeño retraso
+            setTimeout(() => {
+                ringText.style.opacity = '1';
+            }, 1000);
 
-                    subText.animate([
-                        { transform: 'translateY(30px)', opacity: 0 },
-                        { transform: 'translateY(0)', opacity: 1 }
-                    ], { duration: 2500, delay: 600, easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)', fill: 'forwards' });
-
-                }, 1800); // 1.8 segundos de retraso para el texto
-            }
+            // Hacer visible el botón después de 5 segundos para que aprecie el anillo
+            setTimeout(() => {
+                btnNext.classList.add('visible');
+            }, 5000);
         }
 
-        // Soportar tanto clicks (ratón) como toques en pantalla
-        container.addEventListener('click', revealGift);
-        container.addEventListener('touchstart', revealGift, { passive: true });
+        function fadeNextImage() {
+            // Ocultar imagen actual
+            images[currentImageIndex].classList.remove('active');
+
+            // Pasar a la siguiente
+            currentImageIndex = (currentImageIndex + 1) % images.length;
+
+            // Mostrar nueva imagen
+            images[currentImageIndex].classList.add('active');
+        }
+
+        function showStore() {
+            // Detener el slider
+            clearInterval(sliderInterval);
+
+            // Ocultar galería
+            ringGallery.style.opacity = '0';
+            ringGallery.style.pointerEvents = 'none';
+
+            // Mostrar tienda Kevin's
+            storeScreen.classList.add('active');
+            storeScreen.style.opacity = '1';
+            storeScreen.style.pointerEvents = 'auto';
+        }
     </script>
 </body>
 
