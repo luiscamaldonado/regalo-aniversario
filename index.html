@@ -19,7 +19,6 @@
             font-family: 'Montserrat', sans-serif;
             overflow: hidden;
             touch-action: none;
-            /* Previene scroll en móviles */
             display: flex;
             justify-content: center;
             align-items: center;
@@ -55,7 +54,6 @@
             min-width: 100%;
             min-height: 100%;
             object-fit: cover;
-            /* Asegura que cubran toda la pantalla como un fondo cinematográfico */
             transition: opacity 2.5s ease-in-out, filter 2.5s ease-in-out, transform 4s ease-out;
             box-shadow: inset 0 0 100px rgba(0, 0, 0, 1);
         }
@@ -65,7 +63,6 @@
             z-index: 2;
             opacity: 1;
             transform: scale(1.05);
-            /* Ligeramente más grande para que el zoom out se note */
             filter: brightness(0.9);
         }
 
@@ -94,21 +91,17 @@
         /* Acercamiento global de toda la escena */
         .is-open .images-wrapper {
             transform: scale(1.1);
-            /* Efecto de acercarse a la caja */
         }
 
         .is-open #caja-cerrada {
             opacity: 0;
-            /* Desaparece suavemente */
             filter: blur(5px);
             pointer-events: none;
         }
 
         .is-open #caja-abierta {
             opacity: 1;
-            /* Aparece la caja abierta brillante */
             filter: brightness(1.1) contrast(1.1) blur(0px);
-            /* El anillo resplandece */
             z-index: 3;
         }
 
@@ -153,7 +146,7 @@
             }
         }
 
-        /* Capa de los textos finales */
+        /* Capa de los textos finales y logo */
         #ui-layer {
             position: absolute;
             top: 0;
@@ -169,12 +162,12 @@
             opacity: 0;
             pointer-events: none;
             transition: opacity 3s ease-in-out;
-            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.4) 0%, transparent 40%, rgba(0, 0, 0, 0.8) 100%);
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.2) 50%, rgba(0, 0, 0, 0.8) 100%);
         }
 
         h1 {
             font-family: 'Great Vibes', cursive;
-            font-size: 5.5rem;
+            font-size: 4.5rem;
             margin: 0;
             color: #ffd700;
             text-shadow: 0 0 20px rgba(255, 215, 0, 0.5), 0 0 10px rgba(255, 255, 255, 0.8), 2px 2px 8px rgba(0, 0, 0, 1);
@@ -183,13 +176,28 @@
         }
 
         p {
-            font-size: 1.6rem;
+            font-size: 1.4rem;
             font-weight: 300;
-            letter-spacing: 3px;
+            letter-spacing: 2px;
+            line-height: 1.6;
             color: white;
             margin-top: 15px;
             padding: 0 20px;
-            text-shadow: 2px 2px 6px rgba(0, 0, 0, 1), 0 0 10px rgba(255, 255, 255, 0.3);
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 1), 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+
+        .highlight-text {
+            color: #ffd700;
+            font-weight: 400;
+        }
+
+        #kevinsLogo {
+            margin-top: 30px;
+            width: 70%;
+            max-width: 250px;
+            filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.2));
+            opacity: 0;
+            /* Lo animaremos con JS */
         }
 
         /* Efecto destello (Lens Flare) */
@@ -223,18 +231,15 @@
                 transform: translate(-50%, -50%) scale(1);
             }
 
-            /* Brillo máximo rápido */
             100% {
                 opacity: 0;
                 transform: translate(-50%, -50%) scale(1.5);
             }
-
-            /* Se desvanece lento */
         }
 
         @media (max-width: 600px) {
             h1 {
-                font-size: 3.8rem;
+                font-size: 3.2rem;
             }
 
             p {
@@ -243,23 +248,15 @@
 
             #instruction {
                 font-size: 1rem;
-                bottom: 15%;
+                bottom: 12%;
+            }
+
+            #kevinsLogo {
+                max-width: 200px;
             }
 
             .box-image {
                 object-position: center bottom;
-            }
-
-            /* Alinea mejor el móvil a la caja */
-        }
-
-        @media (max-height: 700px) {
-            h1 {
-                font-size: 3.5rem;
-            }
-
-            #instruction {
-                bottom: 5%;
             }
         }
     </style>
@@ -267,9 +264,7 @@
 
 <body>
     <div class="container" id="gift-container">
-
         <div class="images-wrapper">
-            <!-- Dos imágenes fotorrealistas solapadas -->
             <img src="caja_cerrada.png" id="caja-cerrada" class="box-image" alt="Misteriosa caja de regalo cerrada">
             <img src="caja_abierta.png" id="caja-abierta" class="box-image"
                 alt="Anillo de compromiso diamante brillante">
@@ -282,39 +277,36 @@
 
         <div id="ui-layer">
             <h1 id="titleText">Feliz Aniversario mi Amor</h1>
-            <p id="subText">Tú eres el mejor regalo de mi vida.</p>
+            <p id="subText">Eres la luz de mi vida y mi mayor certeza.<br>Un pequeño cofre de luz te está esperando
+                físico y real en...</p>
+            <img id="kevinsLogo" src="kevins.svg" alt="Kevin's Joyeros">
         </div>
     </div>
 
-    <!-- Usamos un pequeño script para coordinar la interactividad y los ritmos fluidos -->
     <script>
         const container = document.getElementById('gift-container');
-        const instruction = document.getElementById('instruction');
         const uiLayer = document.getElementById('ui-layer');
         const titleText = document.getElementById('titleText');
         const subText = document.getElementById('subText');
+        const kevinsLogo = document.getElementById('kevinsLogo');
         let isOpen = false;
 
         function revealGift(event) {
             if (!isOpen) {
                 isOpen = true;
 
-                // Efecto háptico en móviles (Vibración suave)
                 if (navigator.vibrate) {
                     navigator.vibrate([40, 60, 40]);
                 }
 
-                // Disparar las animaciones CSS (Transición de imágenes y destellos)
                 container.classList.add('is-open');
 
-                // Animar la entrada del texto elegante después del impacto del destello
                 setTimeout(() => {
                     uiLayer.style.opacity = '1';
 
-                    // Asegurarnos de que el texto entre suavemente desde abajo
                     titleText.animate([
                         { transform: 'translateY(40px)', opacity: 0 },
-                        { transform: 'translateY(-20px)', opacity: 1 }
+                        { transform: 'translateY(-10px)', opacity: 1 }
                     ], { duration: 2500, easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)', fill: 'forwards' });
 
                     subText.animate([
@@ -322,11 +314,15 @@
                         { transform: 'translateY(0)', opacity: 1 }
                     ], { duration: 2500, delay: 600, easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)', fill: 'forwards' });
 
-                }, 1800); // 1.8 segundos de retraso para el texto
+                    kevinsLogo.animate([
+                        { transform: 'translateY(30px) scale(0.9)', opacity: 0 },
+                        { transform: 'translateY(0) scale(1)', opacity: 1 }
+                    ], { duration: 2500, delay: 1500, easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)', fill: 'forwards' });
+
+                }, 1800);
             }
         }
 
-        // Soportar tanto clicks (ratón) como toques en pantalla
         container.addEventListener('click', revealGift);
         container.addEventListener('touchstart', revealGift, { passive: true });
     </script>
