@@ -485,7 +485,7 @@
         <!-- MÚSICA DE FONDO -->
         <!-- ========================================== -->
         <audio id="romanticMusic" loop>
-            <source src="musica.mp3" type="audio/mpeg">
+            <source src="musica.ogg" type="audio/ogg">
         </audio>
 
     </div>
@@ -507,7 +507,7 @@
             const audio = document.getElementById('romanticMusic');
             if (audio) {
                 audio.volume = 0.5; // Volumen al 50% para que sea suave y de fondo
-                audio.play().catch(err => console.log("Esperando música o archivo musica.mp3 no encontrado"));
+                audio.play().catch(err => console.log("Esperando música o archivo musica.ogg no encontrado"));
             }
 
             // Desvanecer Ventana 1 suavemente
