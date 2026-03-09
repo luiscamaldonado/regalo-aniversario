@@ -481,6 +481,13 @@
 
         </div>
 
+        <!-- ========================================== -->
+        <!-- MÚSICA DE FONDO -->
+        <!-- ========================================== -->
+        <audio id="romanticMusic" loop>
+            <source src="musica.mp3" type="audio/mpeg">
+        </audio>
+
     </div>
 
     <script>
@@ -496,6 +503,13 @@
 
         // --- FUNCION 1: PASAR DE LA VENTANA 1 A LA VENTANA 2 ---
         function pasarAVentana2() {
+            // Reproducir música (funciona perfecto aquí porque es justo tras una interacción del usuario)
+            const audio = document.getElementById('romanticMusic');
+            if (audio) {
+                audio.volume = 0.5; // Volumen al 50% para que sea suave y de fondo
+                audio.play().catch(err => console.log("Esperando música o archivo musica.mp3 no encontrado"));
+            }
+
             // Desvanecer Ventana 1 suavemente
             screen1.style.opacity = '0';
             screen1.style.transform = 'scale(1.05)';
