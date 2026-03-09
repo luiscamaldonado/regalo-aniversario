@@ -496,11 +496,16 @@
 
         // Intentar reproducir automáticamente desde el inicio o en el primer clic por bloqueos del celular
         function attemptPlayMusic() {
-            audio.play().catch(e => console.log("Autoplay bloqueado, esperando interacción táctil."));
+            if (audio.paused) {
+                audio.play().catch(e => console.log("Autoplay bloqueado, esperando interacción de usuario."));
+            }
         }
 
-        document.addEventListener('click', attemptPlayMusic, { once: true });
-        document.addEventListener('touchstart', attemptPlayMusic, { once: true, passive: true });
+        // Atar la función a múltiples eventos para capturar el primer intento táctil o de mouse
+        const userEvents = ['click', 'touchstart', 'pointerdown'];
+        userEvents.forEach(evt => {
+            document.addEventListener(evt, attemptPlayMusic, { once: true, passive: true });
+        });
 
         window.onload = () => {
             attemptPlayMusic(); // Intento directo de entrada
