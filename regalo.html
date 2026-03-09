@@ -484,13 +484,28 @@
         <!-- ========================================== -->
         <!-- MÚSICA DE FONDO -->
         <!-- ========================================== -->
-        <audio id="romanticMusic" loop>
+        <audio id="romanticMusic" loop autoplay>
             <source src="musica.ogg" type="audio/ogg">
         </audio>
 
     </div>
 
     <script>
+        const audio = document.getElementById('romanticMusic');
+        audio.volume = 0.5;
+
+        // Intentar reproducir automáticamente desde el inicio o en el primer clic por bloqueos del celular
+        function attemptPlayMusic() {
+            audio.play().catch(e => console.log("Autoplay bloqueado, esperando interacción táctil."));
+        }
+
+        document.addEventListener('click', attemptPlayMusic, { once: true });
+        document.addEventListener('touchstart', attemptPlayMusic, { once: true, passive: true });
+
+        window.onload = () => {
+            attemptPlayMusic(); // Intento directo de entrada
+        };
+
         const screen1 = document.getElementById('screen-1');
         const screen2 = document.getElementById('screen-2');
 
@@ -503,11 +518,9 @@
 
         // --- FUNCION 1: PASAR DE LA VENTANA 1 A LA VENTANA 2 ---
         function pasarAVentana2() {
-            // Reproducir música (funciona perfecto aquí porque es justo tras una interacción del usuario)
-            const audio = document.getElementById('romanticMusic');
+            // Asegurarnos de que suene en caso que los listeners globales fallaran
             if (audio) {
-                audio.volume = 0.5; // Volumen al 50% para que sea suave y de fondo
-                audio.play().catch(err => console.log("Esperando música o archivo musica.ogg no encontrado"));
+                audio.play().catch(err => console.log(err));
             }
 
             // Desvanecer Ventana 1 suavemente
