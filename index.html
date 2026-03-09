@@ -46,6 +46,9 @@
             height: 100%;
             z-index: 1;
             pointer-events: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         .bg-img {
@@ -63,12 +66,43 @@
             filter: brightness(0.9);
         }
 
-        #caja-abierta {
+        /* Contenedor de la caja abierta para alinear el anillo */
+        .open-box-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
             z-index: 1;
             opacity: 0;
             transform: scale(1);
-            filter: brightness(0.4) blur(10px);
-            /* Muy borrosa para que solo dé la ambientación */
+            filter: brightness(0.8);
+            transition: opacity 2s ease-in-out, transform 4s ease-out, filter 2s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #caja-abierta {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 1;
+        }
+
+        /* ANILLO REAL INTEGRADO EN LA CAJA */
+        #real-ring {
+            position: absolute;
+            z-index: 2;
+            /* Estos valores asumen que el slot de la caja 8k originada está por el centro, un poco abajo */
+            top: 55%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.6);
+            max-width: 40%;
+            max-height: 40%;
+            object-fit: contain;
+            filter: drop-shadow(0 20px 15px rgba(0, 0, 0, 0.9)) drop-shadow(0 0 30px rgba(255, 215, 0, 0.4));
+            transition: transform 4s ease-out;
+            pointer-events: none;
         }
 
         .vignette {
@@ -79,6 +113,7 @@
             height: 100%;
             background: radial-gradient(circle at center, transparent 30%, rgba(0, 0, 0, 0.85) 100%);
             z-index: 3;
+            pointer-events: none;
         }
 
         /* --- TEXTO DE INICIO --- */
@@ -102,15 +137,21 @@
         .is-open #caja-cerrada {
             opacity: 0;
             transform: scale(1.1);
+            pointer-events: none;
         }
 
-        .is-open #caja-abierta {
+        .is-open .open-box-container {
             opacity: 1;
             transform: scale(1.05);
             /* Efecto de acercamiento al interior */
-            filter: brightness(0.6) blur(15px);
-            /* Queda como fondo cinemático dramático */
+            filter: brightness(1.2);
+            /* Brillo al abrir */
             z-index: 3;
+        }
+
+        /* Pequeña animación de levitación para el anillo integrado */
+        .is-open #real-ring {
+            animation: ringFloat 4s ease-in-out infinite alternate;
         }
 
         .is-open #start-text {
@@ -137,65 +178,24 @@
             animation: flash 3s ease-out forwards;
         }
 
-        /* --- GALERÍA DEL ANILLO REAL --- */
-        #ring-gallery {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 10;
-            opacity: 0;
-            /* Aparece después del destello */
-            pointer-events: none;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            transition: opacity 2s ease-in-out;
-            transition-delay: 1.5s;
-        }
-
-        .is-open #ring-gallery {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .ring-images {
-            position: relative;
-            width: 100vw;
-            height: 50vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-top: -15vh;
-            /* Ajuste para el texto */
-        }
-
-        .ring-img {
-            position: absolute;
-            max-width: 85%;
-            max-height: 100%;
-            object-fit: contain;
-            opacity: 0;
-            transition: opacity 2s ease-in-out, transform 4s ease-out;
-            transform: translateY(20px) scale(0.9);
-            filter: drop-shadow(0 15px 25px rgba(0, 0, 0, 0.8)) drop-shadow(0 0 20px rgba(255, 215, 0, 0.3));
-        }
-
-        .ring-img.active {
-            opacity: 1;
-            transform: translateY(0) scale(1.05);
-            animation: float 4s ease-in-out infinite alternate;
-        }
-
+        /* --- TEXTOS ELEGANTES FINALES --- */
         .text-overlay {
             position: absolute;
-            bottom: 15%;
+            bottom: 10%;
             width: 100%;
             padding: 0 20px;
             box-sizing: border-box;
             text-align: center;
+            z-index: 10;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 2s ease-in-out;
+            transition-delay: 1.5s;
+        }
+
+        .is-open .text-overlay {
+            opacity: 1;
+            pointer-events: auto;
         }
 
         h1 {
@@ -317,13 +317,13 @@
             }
         }
 
-        @keyframes float {
+        @keyframes ringFloat {
             0% {
-                transform: translateY(0px) scale(1.05);
+                transform: translate(-50%, -50%) scale(0.65) translateY(0px);
             }
 
             100% {
-                transform: translateY(-15px) scale(1.05);
+                transform: translate(-50%, -50%) scale(0.65) translateY(-10px);
             }
         }
 
@@ -381,7 +381,23 @@
             }
 
             .text-overlay {
-                bottom: 10%;
+                bottom: 8%;
+            }
+
+            /* Ajustar centrado del anillo en móviles */
+            #real-ring {
+                top: 50%;
+                transform: translate(-50%, -50%) scale(0.8);
+            }
+
+            @keyframes ringFloat {
+                0% {
+                    transform: translate(-50%, -50%) scale(0.8) translateY(0px);
+                }
+
+                100% {
+                    transform: translate(-50%, -50%) scale(0.8) translateY(-10px);
+                }
             }
         }
     </style>
@@ -392,7 +408,13 @@
         <!-- Fondo Fotorealista -->
         <div class="bg-layer">
             <img src="caja_cerrada.png" id="caja-cerrada" class="bg-img" alt="Caja cerrada">
-            <img src="caja_abierta.png" id="caja-abierta" class="bg-img" alt="Interior caja">
+
+            <div class="open-box-container">
+                <img src="caja_abierta.png" id="caja-abierta" alt="Interior caja">
+                <!-- Tu anillo real integrado EXACTAMENTE DENTRO DE LA CAJA -->
+                <img src="a4.webp" id="real-ring" alt="Tu anillo real">
+            </div>
+
             <div class="vignette"></div>
             <div class="flare"></div>
         </div>
@@ -400,27 +422,18 @@
         <!-- Texto Inicial -->
         <div id="start-text">Toca para abrir tu regalo</div>
 
-        <!-- Galería del Anillo Real (Flotante) -->
-        <div id="ring-gallery">
-            <div class="ring-images">
-                <img src="a1.webp" class="ring-img active" alt="Tu anillo 1">
-                <img src="a2.webp" class="ring-img" alt="Tu anillo 2">
-                <img src="a3.webp" class="ring-img" alt="Tu anillo 3">
-                <img src="a4.webp" class="ring-img" alt="Tu anillo 4">
-            </div>
-
-            <div class="text-overlay">
-                <h1>Feliz Aniversario mi Amor</h1>
-                <p class="subtitle">Este anillo fue hecho a tu medida, con todo mi corazón.</p>
-                <button class="btn-store" id="btn-next" onclick="showStore(event)">¿Dónde está mi anillo?</button>
-            </div>
+        <!-- Textos Elegantes sobre la caja -->
+        <div class="text-overlay">
+            <h1>Feliz Aniversario mi Amor</h1>
+            <p class="subtitle">Hecho a tu medida, con todo mi corazón.</p>
+            <button class="btn-store" id="btn-next" onclick="showStore(event)">¿Dónde está mi anillo?</button>
         </div>
 
         <!-- Pantalla Final Tienda -->
         <div id="store-screen">
             <img src="kevins.svg" class="store-logo" alt="Kevin's Joyeros">
             <div class="store-message">
-                Tu regalo te está esperando en la joyería lista para que lo recojas.
+                Tu regalo te está esperando en la joyería para que lo recojas.
                 <span>¡Te Amo!</span>
             </div>
         </div>
@@ -428,14 +441,10 @@
 
     <script>
         const container = document.getElementById('main-container');
-        const ringGallery = document.getElementById('ring-gallery');
         const storeScreen = document.getElementById('store-screen');
         const btnNext = document.getElementById('btn-next');
-        const images = document.querySelectorAll('.ring-img');
 
         let isOpen = false;
-        let sliderInterval;
-        let currentImageIndex = 0;
 
         function openBox() {
             if (!isOpen) {
@@ -444,35 +453,22 @@
                 // Efecto de vibración inicial
                 if (navigator.vibrate) navigator.vibrate([40, 60, 40]);
 
-                // Activar animaciones de caja fotorrealista
+                // Activar animaciones de caja fotorrealista y mostrar anillo A4
                 container.classList.add('is-open');
 
-                // Iniciar la galería flotante del anillo
-                setTimeout(() => {
-                    sliderInterval = setInterval(fadeNextImage, 3500);
-                }, 2000);
-
-                // Mostrar el botón de la cita a la joyería después de que aprecien el anillo (6 segundos)
+                // Mostrar el botón de la cita a la joyería después de que aprecien el anillo (5 segundos)
                 setTimeout(() => {
                     btnNext.classList.add('visible');
-                }, 6000);
+                }, 5000);
             }
-        }
-
-        function fadeNextImage() {
-            images[currentImageIndex].classList.remove('active');
-            currentImageIndex = (currentImageIndex + 1) % images.length;
-            images[currentImageIndex].classList.add('active');
         }
 
         function showStore(event) {
             // Evitar que el click se propague al contenedor principal
             event.stopPropagation();
 
-            clearInterval(sliderInterval);
-
             // Ocultar la capa de la caja y anillos
-            ringGallery.style.opacity = '0';
+            document.querySelector('.text-overlay').style.opacity = '0';
             document.querySelector('.bg-layer').style.opacity = '0'; // Fundir a negro
 
             // Mostrar la tienda Kevin's
