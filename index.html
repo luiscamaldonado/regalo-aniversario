@@ -1,482 +1,499 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Feliz Aniversario mi Amor</title>
     <!-- Fuentes elegantes de Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@300;400;600&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@300;400&display=swap" rel="stylesheet">
     <style>
-        body,
-        html {
+        body {
             margin: 0;
             padding: 0;
-            width: 100%;
-            height: 100%;
-            background-color: #050505;
+            overflow: hidden;
+            background: radial-gradient(circle at center, #2a0845 0%, #000000 100%);
             font-family: 'Montserrat', sans-serif;
-            overflow: hidden;
-            touch-action: none;
             color: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            touch-action: none; /* Previene el scroll en móviles al tocar la pantalla */
         }
-
-        .container {
-            position: relative;
-            width: 100%;
-            height: 100%;
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+        #ui-layer {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 2;
             display: flex;
-            justify-content: center;
-            align-items: center;
             flex-direction: column;
-            overflow: hidden;
-            cursor: pointer;
-        }
-
-        /* --- FONDOS DE CAJA FOTORREALISTA --- */
-        .bg-layer {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-            pointer-events: none;
-            display: flex;
             justify-content: center;
             align-items: center;
-        }
-
-        .bg-img {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: opacity 2s ease-in-out, transform 4s ease-out, filter 2s ease;
-        }
-
-        #caja-cerrada {
-            z-index: 2;
-            opacity: 1;
-            transform: scale(1.02);
-            filter: brightness(0.9);
-        }
-
-        /* Contenedor de la caja abierta para alinear el anillo */
-        .open-box-container {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-            opacity: 0;
-            transform: scale(1);
-            filter: brightness(0.8);
-            transition: opacity 2s ease-in-out, transform 4s ease-out, filter 2s ease;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        #caja-abierta {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            z-index: 1;
-        }
-
-        /* ANILLO REAL INTEGRADO EN LA CAJA */
-        #real-ring {
-            position: absolute;
-            z-index: 2;
-            /* Estos valores asumen que el slot de la caja 8k originada está por el centro, un poco abajo */
-            top: 55%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0.6);
-            max-width: 40%;
-            max-height: 40%;
-            object-fit: contain;
-            filter: drop-shadow(0 20px 15px rgba(0, 0, 0, 0.9)) drop-shadow(0 0 30px rgba(255, 215, 0, 0.4));
-            transition: transform 4s ease-out;
-            pointer-events: none;
-        }
-
-        .vignette {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at center, transparent 30%, rgba(0, 0, 0, 0.85) 100%);
-            z-index: 3;
-            pointer-events: none;
-        }
-
-        /* --- TEXTO DE INICIO --- */
-        #start-text {
-            position: absolute;
-            bottom: 12%;
-            width: 100%;
             text-align: center;
-            z-index: 10;
-            font-size: 1.2rem;
-            font-weight: 300;
-            letter-spacing: 4px;
-            text-transform: uppercase;
-            color: rgba(255, 255, 255, 0.9);
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 1);
-            animation: pulse 2.5s infinite ease-in-out;
-            transition: opacity 1s;
-        }
-
-        /* --- ESTADOS AL ABRIR LA CAJA --- */
-        .is-open #caja-cerrada {
-            opacity: 0;
-            transform: scale(1.1);
-            pointer-events: none;
-        }
-
-        .is-open .open-box-container {
-            opacity: 1;
-            transform: scale(1.05);
-            /* Efecto de acercamiento al interior */
-            filter: brightness(1.2);
-            /* Brillo al abrir */
-            z-index: 3;
-        }
-
-        /* Pequeña animación de levitación para el anillo integrado */
-        .is-open #real-ring {
-            animation: ringFloat 4s ease-in-out infinite alternate;
-        }
-
-        .is-open #start-text {
             opacity: 0;
             pointer-events: none;
+            transition: opacity 3s ease-in-out;
+            background: radial-gradient(circle at center, rgba(0,0,0,0) 40%, rgba(0,0,0,0.7) 100%);
         }
-
-        /* --- DESTELLO MÁGICO --- */
-        .flare {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 200vw;
-            height: 200vh;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0) 50%);
-            mix-blend-mode: screen;
-            opacity: 0;
-            z-index: 5;
-            pointer-events: none;
-        }
-
-        .is-open .flare {
-            animation: flash 3s ease-out forwards;
-        }
-
-        /* --- TEXTOS ELEGANTES FINALES --- */
-        .text-overlay {
-            position: absolute;
-            bottom: 10%;
-            width: 100%;
-            padding: 0 20px;
-            box-sizing: border-box;
-            text-align: center;
-            z-index: 10;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 2s ease-in-out;
-            transition-delay: 1.5s;
-        }
-
-        .is-open .text-overlay {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
         h1 {
             font-family: 'Great Vibes', cursive;
-            font-size: 4.5rem;
+            font-size: 5rem;
             margin: 0;
             color: #ffd700;
-            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5), 0 0 10px rgba(255, 255, 255, 0.8), 2px 2px 8px rgba(0, 0, 0, 1);
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5), 0 0 10px rgba(255, 255, 255, 0.8);
+            transform: translateY(-20px);
+            padding: 0 20px;
         }
-
-        p.subtitle {
-            font-size: 1.4rem;
+        p {
+            font-size: 1.5rem;
             font-weight: 300;
             letter-spacing: 2px;
             margin-top: 10px;
-            text-shadow: 2px 2px 8px rgba(0, 0, 0, 1);
+            padding: 0 20px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
         }
-
-        .btn-store {
-            margin-top: 25px;
-            padding: 15px 40px;
-            background: linear-gradient(45deg, #ffd700, #ffba00);
-            border: none;
-            border-radius: 30px;
-            color: #000;
-            font-family: 'Montserrat', sans-serif;
-            font-size: 1.1rem;
-            font-weight: 600;
-            letter-spacing: 1px;
-            cursor: pointer;
-            box-shadow: 0 5px 25px rgba(255, 215, 0, 0.4);
-            transition: transform 0.3s, box-shadow 0.3s;
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .btn-store.visible {
-            opacity: 1;
-            pointer-events: auto;
-            animation: bounceIn 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-        }
-
-        /* --- PANTALLA DE LA TIENDA (KEVIN'S) --- */
-        #store-screen {
+        #instruction {
             position: absolute;
-            top: 0;
-            left: 0;
+            bottom: 10%;
             width: 100%;
-            height: 100%;
-            z-index: 30;
-            opacity: 0;
-            pointer-events: none;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            background: radial-gradient(circle at center, #1a1a1a 0%, #000000 100%);
-            transition: opacity 2s ease-in-out;
-        }
-
-        .store-logo {
-            width: 80%;
-            max-width: 400px;
-            margin-bottom: 40px;
-            filter: drop-shadow(0 0 30px rgba(255, 255, 255, 0.3));
-            transform: scale(0.8);
-            transition: transform 2s ease-out;
-        }
-
-        #store-screen.active .store-logo {
-            transform: scale(1);
-        }
-
-        .store-message {
-            font-size: 1.4rem;
-            font-weight: 300;
-            line-height: 1.6;
-            letter-spacing: 1px;
-            padding: 0 30px;
-            color: #fff;
-            opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 2s ease, transform 2s ease;
-            transition-delay: 1s;
             text-align: center;
+            z-index: 3;
+            font-size: 1.2rem;
+            font-weight: 300;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            animation: pulse 2s infinite;
+            pointer-events: none;
+            color: rgba(255, 255, 255, 0.9);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
         }
-
-        #store-screen.active .store-message {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .store-message span {
-            color: #ffd700;
-            display: block;
-            margin-top: 15px;
-            font-family: 'Great Vibes', cursive;
-            font-size: 3.5rem;
-            letter-spacing: 2px;
-            text-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
-        }
-
-        /* --- ANIMACIONES GLOBALES --- */
         @keyframes pulse {
-            0% {
-                transform: scale(1);
-                opacity: 0.6;
-            }
-
-            50% {
-                transform: scale(1.05);
-                opacity: 1;
-                text-shadow: 0 0 20px rgba(255, 255, 255, 1);
-            }
-
-            100% {
-                transform: scale(1);
-                opacity: 0.6;
-            }
+            0% { transform: scale(1); opacity: 0.6; }
+            50% { transform: scale(1.05); opacity: 1; text-shadow: 0 0 15px rgba(255,255,255,0.8); }
+            100% { transform: scale(1); opacity: 0.6; }
         }
-
-        @keyframes ringFloat {
-            0% {
-                transform: translate(-50%, -50%) scale(0.65) translateY(0px);
-            }
-
-            100% {
-                transform: translate(-50%, -50%) scale(0.65) translateY(-10px);
-            }
+        #loading {
+            position: absolute;
+            top: 50%; width: 100%; text-align: center;
+            z-index: 10; font-size: 1.2rem; letter-spacing: 2px;
+            color: white;
+            transition: opacity 1s;
         }
-
-        @keyframes flash {
-            0% {
-                opacity: 0;
-                transform: translate(-50%, -50%) scale(0.5);
-            }
-
-            20% {
-                opacity: 0.9;
-                transform: translate(-50%, -50%) scale(1);
-            }
-
-            100% {
-                opacity: 0;
-                transform: translate(-50%, -50%) scale(1.5);
-            }
-        }
-
-        @keyframes bounceIn {
-            0% {
-                transform: scale(0);
-            }
-
-            50% {
-                transform: scale(1.1);
-            }
-
-            100% {
-                transform: scale(1);
-            }
-        }
-
+        
+        /* Ajustes responsivos para móviles */
         @media (max-width: 600px) {
-            h1 {
-                font-size: 3.5rem;
-            }
-
-            p.subtitle {
-                font-size: 1.1rem;
-            }
-
-            #start-text {
-                font-size: 1rem;
-                bottom: 8%;
-            }
-
-            .store-message {
-                font-size: 1.2rem;
-            }
-
-            .store-message span {
-                font-size: 2.8rem;
-            }
-
-            .text-overlay {
-                bottom: 8%;
-            }
-
-            /* Ajustar centrado del anillo en móviles */
-            #real-ring {
-                top: 50%;
-                transform: translate(-50%, -50%) scale(0.8);
-            }
-
-            @keyframes ringFloat {
-                0% {
-                    transform: translate(-50%, -50%) scale(0.8) translateY(0px);
-                }
-
-                100% {
-                    transform: translate(-50%, -50%) scale(0.8) translateY(-10px);
-                }
-            }
+            h1 { font-size: 3.5rem; }
+            p { font-size: 1rem; }
+            #instruction { font-size: 0.9rem; margin-bottom: 20px; }
         }
     </style>
 </head>
-
 <body>
-    <div class="container" id="main-container" onclick="openBox()">
-        <!-- Fondo Fotorealista -->
-        <div class="bg-layer">
-            <img src="caja_cerrada.png" id="caja-cerrada" class="bg-img" alt="Caja cerrada">
-
-            <div class="open-box-container">
-                <img src="caja_abierta.png" id="caja-abierta" alt="Interior caja">
-                <!-- Tu anillo real integrado EXACTAMENTE DENTRO DE LA CAJA -->
-                <img src="a4.webp" id="real-ring" alt="Tu anillo real">
-            </div>
-
-            <div class="vignette"></div>
-            <div class="flare"></div>
-        </div>
-
-        <!-- Texto Inicial -->
-        <div id="start-text">Toca para abrir tu regalo</div>
-
-        <!-- Textos Elegantes sobre la caja -->
-        <div class="text-overlay">
-            <h1>Feliz Aniversario mi Amor</h1>
-            <p class="subtitle">Hecho a tu medida, con todo mi corazón.</p>
-            <button class="btn-store" id="btn-next" onclick="showStore(event)">¿Dónde está mi anillo?</button>
-        </div>
-
-        <!-- Pantalla Final Tienda -->
-        <div id="store-screen">
-            <img src="kevins.svg" class="store-logo" alt="Kevin's Joyeros">
-            <div class="store-message">
-                Tu regalo te está esperando en la joyería para que lo recojas.
-                <span>¡Te Amo!</span>
-            </div>
-        </div>
+    <div id="loading">Preparando tu sorpresa 💖...</div>
+    <div id="canvas-container"></div>
+    <div id="instruction">Toca la caja para abrirla</div>
+    <div id="ui-layer">
+        <h1>Feliz Aniversario mi Amor</h1>
+        <p>Tú eres el mejor regalo de mi vida.</p>
     </div>
 
-    <script>
-        const container = document.getElementById('main-container');
-        const storeScreen = document.getElementById('store-screen');
-        const btnNext = document.getElementById('btn-next');
+    <!-- Librerías de 3D y Animación -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 
+    <script>
+        // Referencias del DOM
+        const container = document.getElementById('canvas-container');
+        const instruction = document.getElementById('instruction');
+        const uiLayer = document.getElementById('ui-layer');
+        const loading = document.getElementById('loading');
+
+        // ==== SETUP DE ESCENA ====
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x2a0845, 0.015);
+
+        // ==== CÁMARA ====
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+        camera.position.set(0, 7, 16);
+
+        // ==== RENDERER ====
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.0;
+        container.appendChild(renderer.domElement);
+
+        // ==== CONTROLES ====
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.enablePan = false;
+        controls.minDistance = 6;
+        controls.maxDistance = 20;
+        controls.maxPolarAngle = Math.PI / 2 + 0.1; // Limita la cámara arriba del piso
+        controls.autoRotate = true;
+        controls.autoRotateSpeed = 1.5;
+
+        // ==== ILUMINACIÓN ====
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.35);
+        scene.add(ambientLight);
+
+        const mainLight = new THREE.SpotLight(0xffffff, 2.5);
+        mainLight.position.set(5, 15, 5);
+        mainLight.angle = Math.PI / 6;
+        mainLight.penumbra = 0.5;
+        mainLight.castShadow = true;
+        mainLight.shadow.bias = -0.0001;
+        scene.add(mainLight);
+
+        const fillLight = new THREE.PointLight(0xaa88ff, 1, 20); 
+        fillLight.position.set(-5, 5, -5);
+        scene.add(fillLight);
+
+        // Entorno reflectivo básico simulado
+        const pmremGenerator = new THREE.PMREMGenerator(renderer);
+        pmremGenerator.compileEquirectangularShader();
+        scene.environment = pmremGenerator.fromScene(new THREE.Scene()).texture; 
+
+        // ==== MATERIALES ====
+        const velvetMaterial = new THREE.MeshStandardMaterial({
+            color: 0x600000, // Rojo carmesí intenso (terciopelo)
+            roughness: 0.9,
+            metalness: 0.1,
+        });
+
+        const velvetInsideMaterial = new THREE.MeshStandardMaterial({
+            color: 0x111111, // Interior oscuro
+            roughness: 0.8,
+            metalness: 0.2
+        });
+
+        const goldMaterial = new THREE.MeshStandardMaterial({
+            color: 0xffd700, // Oro
+            roughness: 0.15,
+            metalness: 1.0,
+        });
+
+        const diamondMaterial = new THREE.MeshPhysicalMaterial({
+            color: 0xffffff,
+            transmission: 0.9, // Simula cristal/diamante
+            opacity: 1,
+            metalness: 0,
+            roughness: 0,
+            ior: 2.4, // Índice de refracción del diamante
+            thickness: 1.5,
+            specularIntensity: 2.0,
+            specularColor: 0xffffff,
+            clearcoat: 1.0,
+            clearcoatRoughness: 0.1
+        });
+
+        // ==== OBJETOS ====
+        const tableGroup = new THREE.Group();
+        scene.add(tableGroup);
+
+        // Plano invisible para recibir sombras
+        const planeGeo = new THREE.PlaneGeometry(50, 50);
+        const planeMat = new THREE.ShadowMaterial({ opacity: 0.4 });
+        const plane = new THREE.Mesh(planeGeo, planeMat);
+        plane.rotation.x = -Math.PI / 2;
+        plane.position.y = 0; 
+        plane.receiveShadow = true;
+        scene.add(plane);
+
+        // GRUPO DE LA CAJA
+        const boxGroup = new THREE.Group();
+        tableGroup.add(boxGroup);
+
+        const boxWidth = 3;
+        const boxHeight = 2;
+        const boxDepth = 3;
+
+        // Caja Inferior
+        const bottomGeo = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
+        const bottomMesh = new THREE.Mesh(bottomGeo, velvetMaterial);
+        bottomMesh.position.y = boxHeight / 2;
+        bottomMesh.castShadow = true;
+        bottomMesh.receiveShadow = true;
+        boxGroup.add(bottomMesh);
+
+        // Cojín interior
+        const cushionGeo = new THREE.BoxGeometry(boxWidth - 0.4, 0.6, boxDepth - 0.4);
+        const cushionMesh = new THREE.Mesh(cushionGeo, velvetInsideMaterial);
+        cushionMesh.position.y = boxHeight; 
+        boxGroup.add(cushionMesh);
+        
+        // Hendidura para el anillo
+        const slitGeo = new THREE.BoxGeometry(boxWidth - 0.8, 0.61, 0.15);
+        const slitMat = new THREE.MeshStandardMaterial({color: 0x000000});
+        const slit = new THREE.Mesh(slitGeo, slitMat);
+        slit.position.y = boxHeight;
+        boxGroup.add(slit);
+
+        // Tapa (Lid)
+        const lidGroup = new THREE.Group();
+        lidGroup.position.set(0, boxHeight, -boxDepth / 2); // Punto de bisagra trasero
+        boxGroup.add(lidGroup);
+
+        const lidGeo = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
+        const lidMesh = new THREE.Mesh(lidGeo, velvetMaterial);
+        lidMesh.position.set(0, boxHeight / 2, boxDepth / 2); // Offset basado en bisagra
+        lidMesh.castShadow = true;
+        lidMesh.receiveShadow = true;
+        lidGroup.add(lidMesh);
+
+        // GRUPO DEL ANILLO
+        const ringGroup = new THREE.Group();
+        ringGroup.position.set(0, boxHeight - 0.3, 0); // Ligeramente escondido en la base
+        boxGroup.add(ringGroup);
+
+        const bandRadius = 0.6;
+        const tubeRadius = 0.12;
+        const bandGeo = new THREE.TorusGeometry(bandRadius, tubeRadius, 32, 100);
+        const band = new THREE.Mesh(bandGeo, goldMaterial);
+        band.rotation.y = Math.PI / 2;
+        band.castShadow = true;
+        ringGroup.add(band);
+
+        // Diamante
+        const stoneGroup = new THREE.Group();
+        stoneGroup.position.y = bandRadius + 0.1; 
+        ringGroup.add(stoneGroup);
+
+        const diaBottomGeo = new THREE.ConeGeometry(0.35, 0.4, 16);
+        diaBottomGeo.rotateX(Math.PI); 
+        const diaBottom = new THREE.Mesh(diaBottomGeo, diamondMaterial);
+        diaBottom.position.y = -0.1; 
+        diaBottom.castShadow = true;
+        stoneGroup.add(diaBottom);
+
+        const diaTopGeo = new THREE.ConeGeometry(0.35, 0.15, 16);
+        const diaTop = new THREE.Mesh(diaTopGeo, diamondMaterial);
+        diaTop.position.y = 0.175;
+        stoneGroup.add(diaTop);
+
+        // Puntas sosteniendo el diamante
+        const prongGeo = new THREE.CylinderGeometry(0.02, 0.02, 0.3, 8);
+        for(let i=0; i<4; i++) {
+            const prong = new THREE.Mesh(prongGeo, goldMaterial);
+            const angle = (i * Math.PI) / 2 + Math.PI/4;
+            const r = 0.3;
+            prong.position.set(Math.cos(angle)*r, 0, Math.sin(angle)*r);
+            prong.rotation.x = Math.PI/8 * Math.sin(angle);
+            prong.rotation.z = -Math.PI/8 * Math.cos(angle);
+            stoneGroup.add(prong);
+        }
+
+        // ==== PARTÍCULAS MÁGICAS (Polvo de estrellas) ====
+        const particlesCount = 1500;
+        const posArray = new Float32Array(particlesCount * 3);
+        const scales = new Float32Array(particlesCount);
+        for(let i = 0; i < particlesCount * 3; i+=3) {
+            posArray[i] = (Math.random() - 0.5) * 30;
+            posArray[i+1] = Math.random() * 20;
+            posArray[i+2] = (Math.random() - 0.5) * 30;
+            scales[i/3] = Math.random();
+        }
+        
+        const particlesGeo = new THREE.BufferGeometry();
+        particlesGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+        particlesGeo.setAttribute('aScale', new THREE.BufferAttribute(scales, 1));
+        
+        const particleShaderMaterial = new THREE.ShaderMaterial({
+            uniforms: {
+                time: { value: 0 },
+                color: { value: new THREE.Color(0xffd700) }
+            },
+            vertexShader: `
+                uniform float time;
+                attribute float aScale;
+                varying vec2 vUv;
+                void main() {
+                    vUv = uv;
+                    vec4 modelPosition = modelMatrix * vec4(position, 1.0);
+                    modelPosition.y += sin(time * 0.5 + modelPosition.x * 2.0) * 0.2;
+                    modelPosition.x += cos(time * 0.3 + modelPosition.z * 2.0) * 0.1;
+                    vec4 viewPosition = viewMatrix * modelPosition;
+                    gl_Position = projectionMatrix * viewPosition;
+                    gl_PointSize = (15.0 * aScale) * (1.0 / -viewPosition.z);
+                }
+            `,
+            fragmentShader: `
+                uniform vec3 color;
+                void main() {
+                    float distanceToCenter = distance(gl_PointCoord, vec2(0.5));
+                    float alpha = 0.05 / distanceToCenter - 0.1;
+                    if(alpha < 0.0) discard;
+                    gl_FragColor = vec4(color, alpha * 0.6);
+                }
+            `,
+            transparent: true,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false
+        });
+
+        const particlesMesh = new THREE.Points(particlesGeo, particleShaderMaterial);
+        scene.add(particlesMesh);
+
+        // ==== INTERACCIÓN ====
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
         let isOpen = false;
 
-        function openBox() {
-            if (!isOpen) {
-                isOpen = true;
+        function onPointerDown(event) {
+            if (isOpen) return;
 
-                // Efecto de vibración inicial
-                if (navigator.vibrate) navigator.vibrate([40, 60, 40]);
+            let clientX, clientY;
+            if (event.changedTouches && event.changedTouches.length > 0) {
+                clientX = event.changedTouches[0].clientX;
+                clientY = event.changedTouches[0].clientY;
+            } else {
+                clientX = event.clientX;
+                clientY = event.clientY;
+            }
 
-                // Activar animaciones de caja fotorrealista y mostrar anillo A4
-                container.classList.add('is-open');
+            mouse.x = (clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(clientY / window.innerHeight) * 2 + 1;
 
-                // Mostrar el botón de la cita a la joyería después de que aprecien el anillo (5 segundos)
-                setTimeout(() => {
-                    btnNext.classList.add('visible');
-                }, 5000);
+            raycaster.setFromCamera(mouse, camera);
+
+            // Verifica si toca cualquier parte de la caja
+            const intersects = raycaster.intersectObjects([bottomMesh, lidMesh]);
+
+            if (intersects.length > 0) {
+                openBox();
             }
         }
 
-        function showStore(event) {
-            // Evitar que el click se propague al contenedor principal
-            event.stopPropagation();
+        window.addEventListener('click', onPointerDown);
+        window.addEventListener('touchstart', onPointerDown, { passive: false });
 
-            // Ocultar la capa de la caja y anillos
-            document.querySelector('.text-overlay').style.opacity = '0';
-            document.querySelector('.bg-layer').style.opacity = '0'; // Fundir a negro
+        function openBox() {
+            isOpen = true;
+            controls.autoRotate = false; // Detiene giro automático
 
-            // Mostrar la tienda Kevin's
-            storeScreen.classList.add('active');
-            storeScreen.style.opacity = '1';
-            storeScreen.style.pointerEvents = 'auto';
+            // Vibración en dispositivos que lo soporten
+            if (navigator.vibrate) {
+                navigator.vibrate(50);
+            }
+
+            // Oculta instrucciones
+            gsap.to(instruction, { opacity: 0, duration: 0.5, ease: "power1.out" });
+            
+            // 1. Abrir la caja (rotar la tapa hacia atrás)
+            gsap.to(lidGroup.rotation, {
+                x: -Math.PI / 1.6, 
+                duration: 2.5,
+                ease: "power3.inOut"
+            });
+
+            // 2. Acercar cámara suavemente
+            gsap.to(camera.position, {
+                x: 0, y: 5.5, z: 8,
+                duration: 3,
+                ease: "power2.inOut"
+            });
+            gsap.to(controls.target, {
+                x: 0, y: boxHeight + 1, z: 0,
+                duration: 3,
+                ease: "power2.inOut"
+            });
+
+            // 3. Elevar el anillo
+            gsap.to(ringGroup.position, {
+                y: boxHeight + 1.2,
+                duration: 3,
+                delay: 0.5,
+                ease: "back.out(1.2)"
+            });
+
+            // 4. Rotar el anillo de manera celestial
+            gsap.to(ringGroup.rotation, {
+                y: Math.PI * 4, 
+                duration: 5,
+                delay: 0.5,
+                ease: "power2.inOut",
+                onComplete: () => {
+                    // Cicló de giro constante final
+                    gsap.to(ringGroup.rotation, {
+                        y: "+=" + Math.PI * 2,
+                        duration: 10,
+                        repeat: -1,
+                        ease: "none"
+                    });
+                }
+            });
+
+            // 5. Encender luz brillante dentro de la caja
+            const innerLight = new THREE.PointLight(0xffffff, 0, 10);
+            innerLight.position.set(0, boxHeight, 0);
+            boxGroup.add(innerLight);
+            
+            gsap.to(innerLight, {
+                intensity: 2.5,
+                duration: 2,
+                delay: 0.5,
+                ease: "power2.out"
+            });
+
+            // Brillo adicional mágico para el diamente
+            diamondMaterial.emissive = new THREE.Color(0xffffff);
+            diamondMaterial.emissiveIntensity = 0; 
+            gsap.to(diamondMaterial, {
+                emissiveIntensity: 0.8, 
+                duration: 2,
+                delay: 1.5
+            });
+
+            // 6. Mostrar el texto de amor con animaciones
+            setTimeout(() => {
+                uiLayer.style.opacity = 1;
+                gsap.from("#ui-layer h1", {
+                    y: 30, opacity: 0, duration: 2, ease: "power3.out"
+                });
+                gsap.from("#ui-layer p", {
+                    y: 20, opacity: 0, duration: 2, delay: 0.5, ease: "power3.out"
+                });
+            }, 3000);
         }
+
+        // Remueve la pantalla de carga tras inicializar (efecto dramático veloz)
+        setTimeout(() => {
+            loading.style.opacity = 0;
+            setTimeout(() => loading.style.display = 'none', 1000);
+        }, 800); 
+
+        // ==== CICLO DE ANIMACIÓN ====
+        const clock = new THREE.Clock();
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            const elapsedTime = clock.getElapsedTime();
+
+            // Partículas flotando
+            particleShaderMaterial.uniforms.time.value = elapsedTime;
+            particlesMesh.rotation.y = elapsedTime * 0.05;
+
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        animate();
+
+        // ==== RESPONSIVIDAD ====
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
     </script>
 </body>
-
 </html>
