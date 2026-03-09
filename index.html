@@ -6,7 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Feliz Aniversario mi Amor</title>
     <!-- Fuentes elegantes de Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@300;400&display=swap"
+    <link
+        href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@300;400;500;600&display=swap"
         rel="stylesheet">
     <style>
         body,
@@ -19,6 +20,7 @@
             font-family: 'Montserrat', sans-serif;
             overflow: hidden;
             touch-action: none;
+            color: white;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -31,7 +33,121 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            overflow: hidden;
+        }
+
+        /* --- VENTANA 1: FOTO Y MENSAJE --- */
+        #screen-1 {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 20;
+            display: flex;
+            flex-direction: row;
+            /* Para escritorio: foto izquierda, texto derecha */
+            background: linear-gradient(135deg, #1a0510 0%, #000000 100%);
+            transition: opacity 1.5s ease-in-out, transform 1.5s ease-in-out;
+        }
+
+        .photo-side {
+            width: 50%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .photo-side img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            /* Intenta centrar la foto lo mejor posible */
+            filter: drop-shadow(0 0 30px rgba(0, 0, 0, 0.8));
+        }
+
+        /* Borde difuminado elegante entre la foto y el texto en escritorio */
+        .photo-gradient {
+            position: absolute;
+            top: 0;
+            right: -2px;
+            width: 20%;
+            height: 100%;
+            background: linear-gradient(to right, transparent, #000000);
+            z-index: 2;
+        }
+
+        .text-side {
+            width: 50%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            box-sizing: border-box;
+            text-align: center;
+            background: #000000;
+        }
+
+        .text-side h1 {
+            font-family: 'Great Vibes', cursive;
+            font-size: 5rem;
+            color: #ffd700;
+            margin-bottom: 20px;
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+        }
+
+        .text-side p {
+            font-size: 1.4rem;
+            font-weight: 300;
+            line-height: 1.8;
+            letter-spacing: 2px;
+            color: #f0f0f0;
+            margin-bottom: 40px;
+        }
+
+        .btn-continue {
+            padding: 15px 40px;
+            background: transparent;
+            border: 2px solid #ffd700;
+            border-radius: 30px;
+            color: #ffd700;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
             cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.2);
+        }
+
+        .btn-continue:hover,
+        .btn-continue:active {
+            background: #ffd700;
+            color: #000;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+            transform: scale(1.05);
+        }
+
+        /* --- VENTANA 2: ANIMACIÓN FOTORREALISTA --- */
+        #screen-2 {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            opacity: 0;
+            pointer-events: none;
+            /* Desactivado inicialmente */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            /* Para abrir la caja */
             perspective: 1000px;
         }
 
@@ -46,7 +162,6 @@
             transition: transform 3s ease-in-out;
         }
 
-        /* Estilos base de las imágenes fotorrealistas */
         .box-image {
             position: absolute;
             max-width: 100%;
@@ -58,7 +173,6 @@
             box-shadow: inset 0 0 100px rgba(0, 0, 0, 1);
         }
 
-        /* Estado Inicial: Caja Cerrada visible */
         #caja-cerrada {
             z-index: 2;
             opacity: 1;
@@ -66,7 +180,6 @@
             filter: brightness(0.9);
         }
 
-        /* Estado Inicial: Caja Abierta oculta */
         #caja-abierta {
             z-index: 1;
             opacity: 0;
@@ -74,7 +187,6 @@
             filter: brightness(0.3) blur(10px);
         }
 
-        /* Viñeta oscura en los bordes para mayor efecto cinematográfico */
         .vignette {
             position: absolute;
             top: 0;
@@ -86,26 +198,7 @@
             pointer-events: none;
         }
 
-        /* === CUANDO EL USUARIO TOCA === */
-
-        /* Acercamiento global de toda la escena */
-        .is-open .images-wrapper {
-            transform: scale(1.1);
-        }
-
-        .is-open #caja-cerrada {
-            opacity: 0;
-            filter: blur(5px);
-            pointer-events: none;
-        }
-
-        .is-open #caja-abierta {
-            opacity: 1;
-            filter: brightness(1.1) contrast(1.1) blur(0px);
-            z-index: 3;
-        }
-
-        /* Texto de instrucción titilante */
+        /* Instrucción para abrir la caja */
         #instruction {
             position: absolute;
             bottom: 10%;
@@ -123,84 +216,29 @@
             transition: opacity 1s ease, transform 1s ease;
         }
 
+        /* --- ESTADOS AL ABRIR LA CAJA --- */
+        .is-open .images-wrapper {
+            transform: scale(1.1);
+        }
+
+        .is-open #caja-cerrada {
+            opacity: 0;
+            filter: blur(5px);
+            pointer-events: none;
+        }
+
+        .is-open #caja-abierta {
+            opacity: 1;
+            filter: brightness(1.1) contrast(1.1) blur(0px);
+            z-index: 3;
+        }
+
         .is-open #instruction {
             opacity: 0;
             transform: translateY(20px);
         }
 
-        @keyframes pulse {
-            0% {
-                transform: scale(1);
-                opacity: 0.6;
-            }
-
-            50% {
-                transform: scale(1.05);
-                opacity: 1;
-                text-shadow: 0 0 20px rgba(255, 255, 255, 1);
-            }
-
-            100% {
-                transform: scale(1);
-                opacity: 0.6;
-            }
-        }
-
-        /* Capa de los textos finales y logo */
-        #ui-layer {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 5;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 3s ease-in-out;
-            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.2) 50%, rgba(0, 0, 0, 0.8) 100%);
-        }
-
-        h1 {
-            font-family: 'Great Vibes', cursive;
-            font-size: 4.5rem;
-            margin: 0;
-            color: #ffd700;
-            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5), 0 0 10px rgba(255, 255, 255, 0.8), 2px 2px 8px rgba(0, 0, 0, 1);
-            transform: translateY(-20px);
-            padding: 0 20px;
-        }
-
-        p {
-            font-size: 1.4rem;
-            font-weight: 300;
-            letter-spacing: 2px;
-            line-height: 1.6;
-            color: white;
-            margin-top: 15px;
-            padding: 0 20px;
-            text-shadow: 2px 2px 8px rgba(0, 0, 0, 1), 0 0 10px rgba(255, 255, 255, 0.3);
-        }
-
-        .highlight-text {
-            color: #ffd700;
-            font-weight: 400;
-        }
-
-        #kevinsLogo {
-            margin-top: 30px;
-            width: 70%;
-            max-width: 250px;
-            filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.2));
-            opacity: 0;
-            /* Lo animaremos con JS */
-        }
-
-        /* Efecto destello (Lens Flare) */
+        /* --- DESTELLO MÁGICO --- */
         .flare {
             position: absolute;
             top: 50%;
@@ -220,6 +258,74 @@
             animation: flash 4s ease-out forwards;
         }
 
+        /* --- CAPA FINAL: TEXTO CODIFICADO Y KEVINS --- */
+        #ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 5;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 3s ease-in-out;
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.3) 50%, rgba(0, 0, 0, 0.8) 100%);
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        #ui-layer h1.final-title {
+            font-family: 'Great Vibes', cursive;
+            font-size: 4rem;
+            margin: 0 0 15px 0;
+            color: #ffd700;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5), 0 0 10px rgba(255, 255, 255, 0.8), 2px 2px 8px rgba(0, 0, 0, 1);
+            transform: translateY(0);
+            /* Reset from previous styles */
+        }
+
+        #ui-layer p.final-text {
+            font-size: 1.5rem;
+            font-weight: 300;
+            letter-spacing: 2px;
+            line-height: 1.6;
+            color: white;
+            margin: 0;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 1), 0 0 10px rgba(255, 255, 255, 0.3);
+            max-width: 800px;
+        }
+
+        #kevinsLogo {
+            margin-top: 30px;
+            width: 70%;
+            max-width: 280px;
+            filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.3));
+        }
+
+        /* --- ANIMACIONES GLOBALES --- */
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 0.6;
+            }
+
+            50% {
+                transform: scale(1.05);
+                opacity: 1;
+                text-shadow: 0 0 20px rgba(255, 255, 255, 1);
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 0.6;
+            }
+        }
+
         @keyframes flash {
             0% {
                 opacity: 0;
@@ -237,13 +343,54 @@
             }
         }
 
-        @media (max-width: 600px) {
-            h1 {
-                font-size: 3.2rem;
+        /* --- RESPONSIVIDAD PARA MÓVILES --- */
+        @media (max-width: 768px) {
+
+            /* Ventana 1 en móvil: Foto arriba, texto abajo */
+            #screen-1 {
+                flex-direction: column;
             }
 
-            p {
+            .photo-side {
+                width: 100%;
+                height: 50%;
+            }
+
+            .photo-gradient {
+                width: 100%;
+                height: 30%;
+                top: auto;
+                bottom: -2px;
+                right: 0;
+                background: linear-gradient(to bottom, transparent, #000000);
+            }
+
+            .text-side {
+                width: 100%;
+                height: 50%;
+                padding: 20px;
+                padding-top: 10px;
+                justify-content: flex-start;
+            }
+
+            .text-side h1 {
+                font-size: 3.8rem;
+                margin-bottom: 10px;
+            }
+
+            .text-side p {
                 font-size: 1.1rem;
+                margin-bottom: 25px;
+                line-height: 1.5;
+            }
+
+            /* Ventana 2 en móvil */
+            #ui-layer h1.final-title {
+                font-size: 3rem;
+            }
+
+            #ui-layer p.final-text {
+                font-size: 1.2rem;
             }
 
             #instruction {
@@ -252,7 +399,8 @@
             }
 
             #kevinsLogo {
-                max-width: 200px;
+                max-width: 180px;
+                margin-top: 20px;
             }
 
             .box-image {
@@ -263,68 +411,124 @@
 </head>
 
 <body>
-    <div class="container" id="gift-container">
-        <div class="images-wrapper">
-            <img src="caja_cerrada.png" id="caja-cerrada" class="box-image" alt="Misteriosa caja de regalo cerrada">
-            <img src="caja_abierta.png" id="caja-abierta" class="box-image"
-                alt="Anillo de compromiso diamante brillante">
+    <div class="container">
+
+        <!-- ========================================== -->
+        <!-- VENTANA 1: FOTO (foto.jpeg) + MENSAJE EMOUTIVO -->
+        <!-- ========================================== -->
+        <div id="screen-1">
+            <div class="photo-side">
+                <!-- Usando directamente la imagen foto.jpeg proporcionada -->
+                <img src="foto.jpeg" alt="Nuestra Foto">
+                <div class="photo-gradient"></div>
+            </div>
+            <div class="text-side">
+                <h1>Para la mujer de mi vida</h1>
+                <p>Cada instante a tu lado ha sido un regalo maravilloso. Eres mi compañera de aventuras, mi alegría
+                    diaria y mi amor eterno. Hoy celebro con toda mi alma el día en que unimos nuestras vidas.</p>
+                <button class="btn-continue" onclick="pasarAVentana2()">Continuar Sorpresa</button>
+            </div>
         </div>
 
-        <div class="vignette"></div>
-        <div class="flare"></div>
+        <!-- ========================================== -->
+        <!-- VENTANA 2: ANIMACIÓN CAJA FOTORREALISTA + KEVINS -->
+        <!-- ========================================== -->
+        <div id="screen-2">
 
-        <div id="instruction">Toca para descubrir tu sorpresa</div>
+            <div class="images-wrapper">
+                <img src="caja_cerrada.png" id="caja-cerrada" class="box-image" alt="Misteriosa caja de regalo cerrada">
+                <img src="caja_abierta.png" id="caja-abierta" class="box-image"
+                    alt="Anillo de compromiso diamante brillante">
+            </div>
 
-        <div id="ui-layer">
-            <h1 id="titleText">Feliz Aniversario mi Amor</h1>
-            <p id="subText">Eres la luz de mi vida y mi mayor certeza.<br>Un pequeño cofre de luz te está esperando
-                físico y real en...</p>
-            <img id="kevinsLogo" src="kevins.svg" alt="Kevin's Joyeros">
+            <div class="vignette"></div>
+            <div class="flare"></div>
+
+            <div id="instruction">Toca para abrir tu regalo</div>
+
+            <div id="ui-layer">
+                <h1 class="final-title">Feliz Aniversario esposa mía.</h1>
+                <p class="final-text">
+                    Este anillo virtual es solo eI comienzo de nuestra eternidad.<br>
+                    Para ver el verdadero brillo de nuestro aniversario, te espero en...
+                </p>
+                <!-- Solo mostramos el logo de Kevins como conclusión -->
+                <img id="kevinsLogo" src="kevins.svg" alt="Kevin's Joyeros">
+            </div>
+
         </div>
+
     </div>
 
     <script>
-        const container = document.getElementById('gift-container');
+        const screen1 = document.getElementById('screen-1');
+        const screen2 = document.getElementById('screen-2');
+
+        // Elementos de la Ventana 2
         const uiLayer = document.getElementById('ui-layer');
-        const titleText = document.getElementById('titleText');
-        const subText = document.getElementById('subText');
+        const finalTitle = document.querySelector('.final-title');
+        const finalText = document.querySelector('.final-text');
         const kevinsLogo = document.getElementById('kevinsLogo');
-        let isOpen = false;
+        let isBoxOpen = false;
 
+        // --- FUNCION 1: PASAR DE LA VENTANA 1 A LA VENTANA 2 ---
+        function pasarAVentana2() {
+            // Desvanecer Ventana 1 suavemente
+            screen1.style.opacity = '0';
+            screen1.style.transform = 'scale(1.05)';
+
+            setTimeout(() => {
+                screen1.style.display = 'none'; // Quitar del flujo para no estorbar
+
+                // Activar Ventana 2
+                screen2.style.opacity = '1';
+                screen2.style.pointerEvents = 'auto'; // Habilitar clics en la caja
+            }, 1000); // 1 segundo de transición de desvanecimiento
+        }
+
+        // --- FUNCION 2: ABRIR LA CAJA Y MOSTRAR ÚLTIMO MENSAJE ---
         function revealGift(event) {
-            if (!isOpen) {
-                isOpen = true;
+            // Solo si NO está abierta y YA estamos en la ventana 2 (por si acaso)
+            if (!isBoxOpen && screen2.style.opacity === '1') {
+                isBoxOpen = true;
 
+                // Vibración celular
                 if (navigator.vibrate) {
                     navigator.vibrate([40, 60, 40]);
                 }
 
-                container.classList.add('is-open');
+                // Disparar las animaciones CSS fotorrealistas de la caja
+                screen2.classList.add('is-open');
 
+                // Animar la entrada ordenada de los textos finales y logo
                 setTimeout(() => {
                     uiLayer.style.opacity = '1';
 
-                    titleText.animate([
+                    // 1. Entra el título gigante
+                    finalTitle.animate([
                         { transform: 'translateY(40px)', opacity: 0 },
-                        { transform: 'translateY(-10px)', opacity: 1 }
+                        { transform: 'translateY(0)', opacity: 1 }
                     ], { duration: 2500, easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)', fill: 'forwards' });
 
-                    subText.animate([
+                    // 2. Entra el texto "Este anillo virtual..."
+                    finalText.animate([
                         { transform: 'translateY(30px)', opacity: 0 },
                         { transform: 'translateY(0)', opacity: 1 }
-                    ], { duration: 2500, delay: 600, easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)', fill: 'forwards' });
+                    ], { duration: 2500, delay: 1000, easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)', fill: 'forwards' });
 
+                    // 3. Entra gloriosamente el logo de Kevins
                     kevinsLogo.animate([
                         { transform: 'translateY(30px) scale(0.9)', opacity: 0 },
                         { transform: 'translateY(0) scale(1)', opacity: 1 }
-                    ], { duration: 2500, delay: 1500, easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)', fill: 'forwards' });
+                    ], { duration: 2500, delay: 2500, easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)', fill: 'forwards' });
 
-                }, 1800);
+                }, 1800); // Retardo antes de que empiece a salir el texto
             }
         }
 
-        container.addEventListener('click', revealGift);
-        container.addEventListener('touchstart', revealGift, { passive: true });
+        // Agregar los eventos de toque/clic a la Ventana 2 para abrir la caja
+        screen2.addEventListener('click', revealGift);
+        screen2.addEventListener('touchstart', revealGift, { passive: true });
     </script>
 </body>
 
